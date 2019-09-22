@@ -66,15 +66,15 @@ numbers=( $(shuf -e "${numbers[@]}") )
 num_str=$(printf ", %s" "${numbers[@]}")
 num_str=${num_str:2}
 /bin/cat <<EOM_find_primes >>$FILE
-\section{Finde und unterstreiche die Primzahlen}
 $num_str
 EOM_find_primes
+echo "\\\\" >> $FILE
+echo "\\\\" >> $FILE
 echo find_primes written to $FILE
 }
 
 function zahlenstrahl {
 /bin/cat <<EOM_zahlenstrahl >>$FILE
-\section{Benenne die markierten Punkte auf dem Zahlenstrahl}
 \begin{tikzpicture} 
 \draw[step=0.5,gray,very thin] (-6,-1) grid (8,1);
 \draw[->,very thick] (-5.5,0) -- (7.5,0);
@@ -88,16 +88,37 @@ done
 znumbers["5"]="0"
 znumbers["6"]="12"
 znumbers=($(printf '%i\n' "${znumbers[@]}"|sort -k1,1n))
-#declare -a shownumbers
-#shownumbers=(0 1 2 3 4 5)
-#shownumbers=( $(shuf -e "${shownumbers[@]}") )
+declare -a shownumbers
+shownumbers=(0 1 2 3 4 5)
+shownumbers=( $(shuf -e "${shownumbers[@]}") )
+declare -a multiplier
+multiplier=(1 10 100)
+multiplier=( $(shuf -e "${multiplier[@]}") )
+startpoint=0
+endpoint=0
+while [ "$startpoint" -gt "-1" ] || [ "$endpoint" -lt "1" ]
+do
+	startpoint=$(( (RANDOM % 160 - 80) * $multiplier))
+	endpoint=$(( $startpoint + $multiplier * 12 ))
+done
 for i in {0..6}
 do
-	echo "\node[label=below:\$${nodelabel[$i]}$] (${nodelabel[$i]}) at ($(( ${znumbers[$i]} - 5 )),0) {};" >> $FILE
+	label=${nodelabel[$i]}
+	if [ "$i" -eq "${shownumbers[0]}" ] || [ "$i" -eq "${shownumbers[1]}"  ]
+	then
+		label="$(($startpoint + ${znumbers[$i]} * $multiplier ))"
+	fi
+	echo "\node[label=below:\$${label}$] (${nodelabel[$i]}) at ($(( ${znumbers[$i]} - 5 )),0) {};" >> $FILE
 	echo "\fill (${nodelabel[$i]}) circle (2pt);" >> $FILE
 done
 echo "\end{tikzpicture}" >> $FILE
-#echo ${znumbers[@]} >> $FILE
+echo "\\\\" >> $FILE
+echo "\\\\" >> $FILE
+echo "\\\\" >> $FILE
+echo "\\\\" >> $FILE
+#echo "\\\\znumber ${znumbers[@]}" >> $FILE
+#echo "\\\\shownumbers ${shownumbers[@]}" >> $FILE
+#echo "\\\\$startpoint" >> $FILE
 }
 
 function coordinate_system {
@@ -142,6 +163,14 @@ echo footer written to $FILE
 }
 
 header
+echo "\section{Finde und unterstreiche die Primzahlen}" >> $FILE
 find_primes
+find_primes
+
+echo "\section{Benenne die markierten Punkte auf dem Zahlenstrahl}" >> $FILE
+zahlenstrahl
+zahlenstrahl
+zahlenstrahl
+zahlenstrahl
 zahlenstrahl
 footer
