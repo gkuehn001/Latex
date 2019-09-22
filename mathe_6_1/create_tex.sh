@@ -5,6 +5,9 @@ FILE="mathetest_6_1.tex"
 declare -a rand
 rand=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)
 
+declare -a nodelabel
+nodelabel=("A" "B" "C" "D" "E")
+
 declare -a primes
 primes=(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97)
 
@@ -32,6 +35,7 @@ function header {
 \usepackage[utf8]{inputenc}
 \usepackage{geometry}
 \usepackage{pgfplots}
+\usepackage{tikz}
 \usetikzlibrary{arrows.meta}
 
 \pagenumbering{gobble}
@@ -49,7 +53,7 @@ echo $num_primes
 declare -a numbers
 primes=( $(shuf -e "${primes[@]}") )
 non_primes=( $(shuf -e "${non_primes[@]}") )
-for i in {1..10}
+for i in {0..10}
 do
 	if [ "$num_primes" -ge "$i" ]
 	then
@@ -59,11 +63,28 @@ do
 	fi
 done
 numbers=( $(shuf -e "${numbers[@]}") )
-echo ${numbers[@]}
+num_str=$(printf ", %s" "${numbers[@]}")
+num_str=${num_str:2}
 /bin/cat <<EOM_find_primes >>$FILE
 \section{Finde und unterstreiche die Primzahlen}
+$num_str
 EOM_find_primes
 echo find_primes written to $FILE
+}
+
+function zahlenstrahl {
+/bin/cat <<EOM_zahlenstrahl >>$FILE
+\section{Benenne die markierten Punkte auf dem Zahlenstrahl}
+\begin{tikzpicture} 
+\draw[step=0.5,gray,very thin] (-6,-1) grid (8,1);
+\draw[->,very thick] (-5.5,0) -- (7.5,0);
+\node[label=below:\$A$] (A) at (-5,0) {};
+\fill (A) circle (2pt);
+\node[label=below:\$B$] (B) at (7,0) {};
+\fill (B) circle (2pt);
+EOM_zahlenstrahl
+declare -a znumbers;
+echo "\end{tikzpicture}" >> $FILE
 }
 
 function coordinate_system {
@@ -109,4 +130,5 @@ echo footer written to $FILE
 
 header
 find_primes
+zahlenstrahl
 footer
