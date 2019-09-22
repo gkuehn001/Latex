@@ -3,10 +3,10 @@
 FILE="mathetest_6_1.tex"
 
 declare -a rand
-rand=(0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17)
+rand=(1 2 3 4 5 6 7 8 9 10 11)
 
 declare -a nodelabel
-nodelabel=("A" "B" "C" "D" "E")
+nodelabel=("A" "B" "C" "D" "E" "F" "G")
 
 declare -a primes
 primes=(2 3 5 7 11 13 17 19 23 29 31 37 41 43 47 53 59 61 67 71 73 79 83 89 97)
@@ -78,13 +78,26 @@ function zahlenstrahl {
 \begin{tikzpicture} 
 \draw[step=0.5,gray,very thin] (-6,-1) grid (8,1);
 \draw[->,very thick] (-5.5,0) -- (7.5,0);
-\node[label=below:\$A$] (A) at (-5,0) {};
-\fill (A) circle (2pt);
-\node[label=below:\$B$] (B) at (7,0) {};
-\fill (B) circle (2pt);
 EOM_zahlenstrahl
 declare -a znumbers;
+rand=( $(shuf -e "${rand[@]}") )
+for i in {0..4}
+do
+	znumbers[$i]=${rand[$i]}
+done
+znumbers["5"]="0"
+znumbers["6"]="12"
+znumbers=($(printf '%i\n' "${znumbers[@]}"|sort -k1,1n))
+#declare -a shownumbers
+#shownumbers=(0 1 2 3 4 5)
+#shownumbers=( $(shuf -e "${shownumbers[@]}") )
+for i in {0..6}
+do
+	echo "\node[label=below:\$${nodelabel[$i]}$] (${nodelabel[$i]}) at ($(( ${znumbers[$i]} - 5 )),0) {};" >> $FILE
+	echo "\fill (${nodelabel[$i]}) circle (2pt);" >> $FILE
+done
 echo "\end{tikzpicture}" >> $FILE
+#echo ${znumbers[@]} >> $FILE
 }
 
 function coordinate_system {
